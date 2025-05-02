@@ -37,14 +37,23 @@
 
 ## 🛠 Installation
 
-### 1. Ajouter le package en local
+### 1. Ajouter le dépôt GitHub dans Composer
 
-Si tu utilises ce package dans `packages/zcrm-multi` :
+Ajoute ce dépôt dans ton `composer.json` si ce n’est pas déjà fait :
+
+```json
+"repositories": [
+  {
+    "type": "vcs",
+    "url": "https://github.com/o1oo1o1o-u/ZCRM.git"
+  }
+]
+
 
 ```bash
-composer config repositories.zcrm path ./packages/zcrm-multi
 composer require devreux/zcrm-multi:dev-main
 ```
+
 
 ### 2. Publier la config
 

@@ -9,6 +9,12 @@
             "email": "contact@devreux.fr"
         }
     ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/o1oo1o1o-u/ZCRM.git"
+        }
+    ],
     "require": {
         "php": "^7.4|^8.0|^8.1|^8.2",
         "illuminate/support": "^8.0|^9.0|^10.0",
