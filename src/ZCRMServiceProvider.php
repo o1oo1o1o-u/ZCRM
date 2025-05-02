@@ -6,6 +6,8 @@ use Illuminate\Support\ServiceProvider;
 use ZCRM\Commands\AddCrmCommand;
 use ZCRM\Commands\ListCrmCommand;
 use ZCRM\Commands\RemoveCrmCommand;
+use ZCRM\Commands\InitAuthCommand;
+use ZCRM\Commands\ExchangeCodeCommand;
 
 class ZCRMServiceProvider extends ServiceProvider
 {
@@ -25,7 +27,12 @@ class ZCRMServiceProvider extends ServiceProvider
                 AddCrmCommand::class,
                 ListCrmCommand::class,
                 RemoveCrmCommand::class,
+                InitAuthCommand::class,
+                ExchangeCodeCommand::class,
             ]);
         }
+
+        // 👉 Route auto
+        $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
     }
 }
