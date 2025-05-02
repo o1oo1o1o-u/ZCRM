@@ -1,0 +1,35 @@
+{
+    "name": "devreux/zcrm-multi",
+    "description": "Zoho CRM multi-account manager for Laravel",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ju - Devreux",
+            "email": "contact@devreux.fr"
+        }
+    ],
+    "require": {
+        "php": "^7.4|^8.0|^8.1|^8.2",
+        "illuminate/support": "^8.0|^9.0|^10.0",
+        "guzzlehttp/guzzle": "^7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Devreux\\ZcrmMulti\\": "src/",
+            "ZCRM\\": "src/"
+        }
+    },
+    "extra": {
+      "laravel": {
+        "providers": [
+          "ZCRM\\ZCRMServiceProvider"
+        ],
+        "aliases": {
+          "ZCRM": "ZCRM\\ZCRM"
+        }
+      }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
