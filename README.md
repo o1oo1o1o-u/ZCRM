@@ -50,8 +50,14 @@ Ajoute ce dépôt dans ton `composer.json` si ce n’est pas déjà fait :
 ]
 ```
 
+OU
+
 ```bash
-composer require devreux/zcrm-multi:dev-main
+composer config repositories.zcrm vcs https://github.com/o1oo1o1o-u/ZCRM.git
+```
+
+```bash
+composer require devreux/zcrm-multi:^1.0
 ```
 
 
