@@ -33,6 +33,11 @@ class InitAuthCommand extends Command
         // Sauvegarde dans storage
         $pendingFile = storage_path('app/zcrm/pending.json');
 
+        $pendingDir = storage_path('app/zcrm');
+        if (!is_dir($pendingDir)) {
+            mkdir($pendingDir, 0755, true);
+        }
+
         file_put_contents($pendingFile, json_encode([
             'name' => $name,
             'client_id' => $clientId,
