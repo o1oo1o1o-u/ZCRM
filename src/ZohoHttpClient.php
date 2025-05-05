@@ -83,7 +83,7 @@ class ZohoHttpClient
 
             $body = (string) $res->getBody();
             $data = json_decode($body, true);
-
+            logger($res);
             if (!is_array($data)) {
                 logger()->error("🛑 Zoho ($method $endpoint) – Réponse non JSON :\n" . $body);
                 throw new ZCRMException("Réponse inattendue de Zoho ($method $endpoint) : contenu non JSON.");
