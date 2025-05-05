@@ -39,7 +39,9 @@ class ZohoHttpClient
 
     protected function refreshToken(): void
     {
-        $res = (new Client())->post($this->crm['api_domain'] . '/oauth/v2/token', [
+        $accountsDomain = 'https://accounts.zoho.' . ($this->crm['region'] ?? 'eu');
+
+        $res = (new Client())->post($accountsDomain . '/oauth/v2/token', [
             'form_params' => [
                 'refresh_token' => $this->crm['refresh_token'],
                 'client_id' => $this->crm['client_id'],
