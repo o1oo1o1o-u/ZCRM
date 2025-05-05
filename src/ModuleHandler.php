@@ -55,14 +55,21 @@ class ModuleHandler
         $response = $this->client->get($this->module, $params);
 
         if (!isset($response['data'])) {
-            throw new ZCRMException("Erreur lors de la récupération des enregistrements.");
+            throw new ZCRMException(
+                "Erreur lors de la récupération des enregistrements.\nRéponse brute : " . json_encode($response)
+            );
         }
 
         return $response['data'];
     }
 
+
     public function getRecord(string $id): array
     {
+        if (!preg_match('/^\d+$/', $id)) {
+            throw new ZCRMException("L’ID fourni pour le module {$this->module} est invalide : $id");
+        }
+
         $response = $this->client->get("{$this->module}/{$id}");
 
         if (!isset($response['data'][0])) {
