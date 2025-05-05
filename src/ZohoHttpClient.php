@@ -5,6 +5,7 @@ namespace ZCRM;
 use GuzzleHttp\Client;
 use Carbon\Carbon;
 use ZCRM\Exceptions\ZCRMException;
+use ZCR\Support\ClientManager;
 
 class ZohoHttpClient
 {
