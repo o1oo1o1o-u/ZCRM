@@ -147,6 +147,31 @@ class ZohoHttpClient
     }
     public function postMultipart(string $endpoint, array $multipart): array
     {
-        return $this->request('POST', $endpoint, ['multipart' => $multipart]);
+        try {
+            $res = $this->http->request('POST', $endpoint, [
+                'headers' => [
+                    'Authorization' => 'Zoho-oauthtoken ' . $this->getCrmInfo()['access_token'],
+                ],
+                'multipart' => $multipart,
+            ]);
+
+            $body = (string) $res->getBody();
+            $json = json_decode($body, true);
+
+            if (json_last_error() !== JSON_ERROR_NONE || !is_array($json)) {
+                throw new ZCRMException("Réponse non JSON lors de l'envoi de fichier.");
+            }
+
+            return $json;
+        } catch (\Throwable $e) {
+            $msg = "Erreur HTTP (POST $endpoint): " . $e->getMessage();
+
+            if ($e instanceof \GuzzleHttp\Exception\RequestException && $e->hasResponse()) {
+                $res = $e->getResponse();
+                $msg .= "\nRéponse Zoho [" . $res->getStatusCode() . "]:\n" . (string) $res->getBody();
+            }
+
+            throw new ZCRMException($msg, $e->getCode(), $e);
+        }
     }
 }

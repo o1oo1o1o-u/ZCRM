@@ -146,20 +146,15 @@ class ModuleHandler
 
         $endpoint = "{$this->module}/{$recordId}/Attachments";
 
-        $response = $this->client->postMultipart($endpoint, [
+        return $this->client->postMultipart($endpoint, [
             [
                 'name'     => 'file',
                 'contents' => fopen($filePath, 'r'),
                 'filename' => basename($filePath),
-            ],
+            ]
         ]);
-
-        if (!isset($response['data'][0])) {
-            throw new ZCRMException("Échec de l’upload : " . json_encode($response));
-        }
-
-        return $response['data'][0];
     }
+
 
 
 
