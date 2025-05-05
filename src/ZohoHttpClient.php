@@ -6,6 +6,8 @@ use GuzzleHttp\Client;
 use Carbon\Carbon;
 use ZCRM\Exceptions\ZCRMException;
 use ZCRM\Support\ClientManager;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\RequestException;
 
 class ZohoHttpClient
 {
@@ -85,13 +87,19 @@ class ZohoHttpClient
             $data = json_decode($body, true);
 
             if (!is_array($data)) {
-                throw new ZCRMException("Réponse inattendue de Zoho ($method $endpoint):\n" . substr($body, 0, 1000));
+                logger()->error("Zoho: réponse invalide ($method $endpoint):\n" . $body);
+                throw new ZCRMException("Réponse inattendue de Zoho ($method $endpoint): contenu non JSON ou vide.");
             }
 
             return $data;
+        } catch (ClientException | RequestException $e) {
+            $response = $e->getResponse();
+            $body = $response ? (string) $response->getBody() : 'Aucune réponse';
+            logger()->error("Erreur Zoho ($method $endpoint):\n" . $body);
+            throw new ZCRMException("Erreur HTTP Zoho ($method $endpoint): {$e->getMessage()}", 0, $e);
         } catch (\Throwable $e) {
-            // Ajout d’un message explicite
-            throw new ZCRMException("Erreur lors de la requête $method $endpoint : " . $e->getMessage(), 0, $e);
+            logger()->error("Erreur interne Zoho ($method $endpoint):\n" . $e->getMessage());
+            throw new ZCRMException("Erreur interne lors de la requête $method $endpoint", 0, $e);
         }
     }
 
