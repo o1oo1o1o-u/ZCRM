@@ -6,8 +6,6 @@ use GuzzleHttp\Client;
 use Carbon\Carbon;
 use ZCRM\Exceptions\ZCRMException;
 use ZCRM\Support\ClientManager;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\RequestException;
 
 class ZohoHttpClient
 {
@@ -92,19 +90,19 @@ class ZohoHttpClient
             }
 
             return $data;
-        } catch (ClientException | RequestException $e) {
-            $response = $e->getResponse();
-            $body = $response ? (string) $response->getBody() : 'Aucune réponse';
-            logger()->error("❌ Erreur Zoho ($method $endpoint):\n" . $body);
-
-            throw new ZCRMException(
-                "Erreur HTTP Zoho ($method $endpoint) :\n" . $body,
-                $e->getCode(),
-                $e
-            );
         } catch (\Throwable $e) {
-            logger()->error("💣 Exception Zoho ($method $endpoint): " . $e->getMessage());
-            throw new ZCRMException("Erreur interne Zoho ($method $endpoint): " . $e->getMessage(), 0, $e);
+            logger($e);
+            $body = method_exists($e, 'getResponse') && $e->getResponse()
+                ? (string) $e->getResponse()->getBody()
+                : '⚠️ Aucune réponse ou accès impossible à getResponse().';
+
+            logger()->error("❌ Erreur Zoho ($method $endpoint) :
+        Message : " . $e->getMessage() . "
+        Code : " . $e->getCode() . "
+        Classe : " . get_class($e) . "
+        Contenu : " . $body);
+
+            throw new ZCRMException("Erreur lors de la requête $method $endpoint : " . $e->getMessage(), $e->getCode(), $e);
         }
     }
 
