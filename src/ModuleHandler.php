@@ -147,13 +147,13 @@ class ModuleHandler
         $endpoint = "{$this->module}/{$recordId}/Attachments";
 
         $client = new \GuzzleHttp\Client([
-            'base_uri' => $this->client->crm['api_domain'] . '/crm/v2/',
+            'base_uri' => $this->client->getCrmInfo()['api_domain'] . '/crm/v2/',
             'timeout' => 10.0,
         ]);
 
         $response = $client->post($endpoint, [
             'headers' => [
-                'Authorization' => 'Zoho-oauthtoken ' . $this->client->crm['access_token'],
+                'Authorization' => 'Zoho-oauthtoken ' . $this->client->getCrmInfo()['access_token'],
             ],
             'multipart' => [
                 [

@@ -28,6 +28,11 @@ class ZohoHttpClient
         ]);
     }
 
+    public function getCrmInfo(): array
+    {
+        return $this->crm;
+    }
+
     protected function isTokenExpired(): bool
     {
         if (empty($this->crm['access_token']) || empty($this->crm['expires_at'])) {
