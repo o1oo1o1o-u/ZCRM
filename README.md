@@ -143,7 +143,7 @@ $leads = ZCRM::useModule('Leads')->getRecords([
 $newLead = ZCRM::useModule('Leads')->createRecord([
     'First_Name' => 'Ju',
     'Last_Name' => 'Devreux',
-    'Email' => 'ju@devreux.fr'
+    'Email' => 'contact@devreux.fr'
 ]);
 
 // Mettre à jour un enregistrement existant
