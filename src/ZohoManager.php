@@ -18,6 +18,14 @@ class ZohoManager
 
     public function useModule(string $moduleName): self
     {
+        if (!$this->crmName) {
+            $defaultCrm = (new \ZCRM\Support\ClientManager())->getConnection();
+            if (!$defaultCrm) {
+                throw new ZCRMException("Aucune connexion CRM trouvée.");
+            }
+            $this->crmName = $defaultCrm['name'];
+        }
+
         $this->moduleName = $moduleName;
         return $this;
     }
