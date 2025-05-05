@@ -3,7 +3,7 @@
 namespace ZCRM\Commands;
 
 use Illuminate\Console\Command;
-use ZCRM\ClientManager;
+use ZCRM\Support\ClientManager;
 
 /**
  * php artisan zcrm:add-crm \
