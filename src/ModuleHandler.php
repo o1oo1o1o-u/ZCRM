@@ -146,15 +146,7 @@ class ModuleHandler
 
         $endpoint = "{$this->module}/{$recordId}/Attachments";
 
-        $client = new \GuzzleHttp\Client([
-            'base_uri' => $this->client->getCrmInfo()['api_domain'] . '/crm/v2/',
-            'timeout' => 10.0,
-        ]);
-
-        $response = $client->post($endpoint, [
-            'headers' => [
-                'Authorization' => 'Zoho-oauthtoken ' . $this->client->getCrmInfo()['access_token'],
-            ],
+        $response = $this->client->request('POST', $endpoint, [
             'multipart' => [
                 [
                     'name'     => 'file',
@@ -162,16 +154,17 @@ class ModuleHandler
                     'filename' => basename($filePath),
                 ],
             ],
+            // on n’écrase pas les headers ici : getHeaders() sera appliqué par défaut
         ]);
 
-        $data = json_decode($response->getBody(), true);
-
-        if (!isset($data['data'][0]['code']) || $data['data'][0]['code'] !== 'SUCCESS') {
-            throw new ZCRMException("Erreur lors de l'upload du fichier.");
+        if (!isset($response['data'][0])) {
+            throw new ZCRMException("Échec de l’upload : " . json_encode($response));
         }
 
-        return $data['data'][0];
+        return $response['data'][0];
     }
+
+
 
     public function findByCriteria(string $criteria): array
     {
