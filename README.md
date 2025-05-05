@@ -84,7 +84,7 @@ Vous devez enregistrer votre application Zoho pour récupérer les identifiants 
 
 ## 🔧 Configuration
 
-Il existe deux méthodes pour configurer une connexion CRM :
+Pour configurer une connexion CRM :
 
 
 ### Commande `zcrm:init-auth` (assistée)

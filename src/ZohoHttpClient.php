@@ -81,7 +81,14 @@ class ZohoHttpClient
             'query' => $query,
         ]);
 
-        return json_decode($res->getBody(), true);
+        $body = (string) $res->getBody();
+        $data = json_decode($body, true);
+
+        if (!is_array($data)) {
+            throw new ZCRMException("Réponse inattendue de Zoho (GET $endpoint): $body");
+        }
+
+        return $data;
     }
 
     public function post(string $endpoint, array $data): array
