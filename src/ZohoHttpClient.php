@@ -74,6 +74,16 @@ class ZohoHttpClient
         ];
     }
 
+    protected function extractGuzzleResponse($res): array
+    {
+        return [
+            'status' => $res->getStatusCode(),
+            'reason' => $res->getReasonPhrase(),
+            'headers' => $res->getHeaders(),
+            'body' => (string) $res->getBody(),
+            'protocol' => $res->getProtocolVersion(),
+        ];
+    }
     protected function request(string $method, string $endpoint, array $options = []): array
     {
         try {
@@ -83,7 +93,7 @@ class ZohoHttpClient
 
             $body = (string) $res->getBody();
             $data = json_decode($body, true);
-            logger($res);
+            logger($this->extractGuzzleResponse($res));
             if (!is_array($data)) {
                 logger()->error("🛑 Zoho ($method $endpoint) – Réponse non JSON :\n" . $body);
                 throw new ZCRMException("Réponse inattendue de Zoho ($method $endpoint) : contenu non JSON.");
