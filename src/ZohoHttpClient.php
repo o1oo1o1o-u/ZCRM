@@ -87,19 +87,24 @@ class ZohoHttpClient
             $data = json_decode($body, true);
 
             if (!is_array($data)) {
-                logger()->error("Zoho: réponse invalide ($method $endpoint):\n" . $body);
-                throw new ZCRMException("Réponse inattendue de Zoho ($method $endpoint): contenu non JSON ou vide.");
+                logger()->error("🛑 Zoho ($method $endpoint) – Réponse non JSON :\n" . $body);
+                throw new ZCRMException("Réponse inattendue de Zoho ($method $endpoint) : contenu non JSON.");
             }
 
             return $data;
         } catch (ClientException | RequestException $e) {
             $response = $e->getResponse();
             $body = $response ? (string) $response->getBody() : 'Aucune réponse';
-            logger()->error("Erreur Zoho ($method $endpoint):\n" . $body);
-            throw new ZCRMException("Erreur HTTP Zoho ($method $endpoint): {$e->getMessage()}", 0, $e);
+            logger()->error("❌ Erreur Zoho ($method $endpoint):\n" . $body);
+
+            throw new ZCRMException(
+                "Erreur HTTP Zoho ($method $endpoint) :\n" . $body,
+                $e->getCode(),
+                $e
+            );
         } catch (\Throwable $e) {
-            logger()->error("Erreur interne Zoho ($method $endpoint):\n" . $e->getMessage());
-            throw new ZCRMException("Erreur interne lors de la requête $method $endpoint", 0, $e);
+            logger()->error("💣 Exception Zoho ($method $endpoint): " . $e->getMessage());
+            throw new ZCRMException("Erreur interne Zoho ($method $endpoint): " . $e->getMessage(), 0, $e);
         }
     }
 
