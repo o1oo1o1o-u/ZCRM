@@ -86,24 +86,31 @@ class ZohoHttpClient
     }
     protected function request(string $method, string $endpoint, array $options = []): array
     {
-        try {
-            $res = $this->http->request($method, $endpoint, array_merge([
-                'headers' => $this->getHeaders(),
-            ], $options));
+        $res = $this->http->request($method, $endpoint, [
+            'headers' => $this->getHeaders(),
+            ...$options,
+        ]);
 
-            $body = (string) $res->getBody();
-            $data = json_decode($body, true);
-            logger($this->extractGuzzleResponse($res));
-            if (!is_array($data)) {
-                logger()->error("🛑 Zoho ($method $endpoint) – Réponse non JSON :\n" . $body);
-                throw new ZCRMException("Réponse inattendue de Zoho ($method $endpoint) : contenu non JSON.");
-            }
+        $status = $res->getStatusCode();
+        $body = (string) $res->getBody();
 
-            return $data;
-        } catch (\Exception $e) {
-            logger($e);
+        // Log optionnel complet (si tu veux garder)
+        // logger()->debug('Réponse Zoho', extractGuzzleResponse($res));
+
+        // Gérer les 204 ou contenu vide
+        if ($status === 204 || trim($body) === '') {
+            return []; // retourne un tableau vide au lieu de null
         }
+
+        $json = json_decode($body, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE || !is_array($json)) {
+            throw new ZCRMException("Réponse inattendue de Zoho ($method $endpoint): contenu non JSON ou vide.");
+        }
+
+        return $json;
     }
+
 
 
     public function get(string $endpoint, array $query = []): array
