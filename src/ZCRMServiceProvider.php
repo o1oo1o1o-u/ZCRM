@@ -33,6 +33,6 @@ class ZCRMServiceProvider extends ServiceProvider
         }
 
         // 👉 Route auto
-        $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
+        $this->loadRoutesFrom(__DIR__ . '/routes/web.php');
     }
 }
