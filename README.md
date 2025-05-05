@@ -241,13 +241,6 @@ try {
 }
 ```
 
-## 📚 Roadmap
-
-- [ ] Recherche par email ou téléphone
-- [ ] Support des modules personnalisés
-- [ ] Téléchargement de pièces jointes
-- [ ] Cache et log optionnels
-- [ ] Tests unitaires
 
 ## 👨‍💻 Auteur
 

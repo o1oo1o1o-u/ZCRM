@@ -16,17 +16,21 @@ class ZohoHttpClient
     public function __construct(?string $crmName = null)
     {
         $this->manager = new ClientManager();
-        $this->crm = $this->manager->getConnection($crmName);
 
-        if (!$this->crm) {
+        $connection = $this->manager->getConnection($crmName);
+
+        if (!$connection || !is_array($connection)) {
             throw new ZCRMException("Aucune connexion CRM disponible.");
         }
+
+        $this->crm = $connection;
 
         $this->http = new Client([
             'base_uri' => $this->crm['api_domain'] . '/crm/v2/',
             'timeout' => 10.0,
         ]);
     }
+
 
     public function getCrmInfo(): array
     {

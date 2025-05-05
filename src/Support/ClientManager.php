@@ -13,7 +13,9 @@ class ClientManager
 
     public function __construct()
     {
-        $this->path = config('zcrm.storage_path') . '/crm_connections.sqlite';
+        $this->path = function_exists('config') && config('zcrm.storage_path')
+            ? config('zcrm.storage_path') . '/crm_connections.sqlite'
+            : sys_get_temp_dir() . '/zcrm_test.sqlite';
 
         if (!File::exists(dirname($this->path))) {
             File::makeDirectory(dirname($this->path), 0755, true);

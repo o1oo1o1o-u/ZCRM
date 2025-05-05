@@ -19,6 +19,11 @@
         "ZCRM\\": "src/"
       }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "ZCRM\\Tests\\": "tests/"
+        }
+    },
     "extra": {
       "laravel": {
         "providers": [
@@ -29,8 +34,14 @@
         }
       }
     },
+    "scripts": {
+        "test": "phpunit"
+    },
     "minimum-stability": "dev",
     "prefer-stable": true,
-    "keywords": ["zoho", "crm", "laravel", "multi-account", "oauth2"]
-  }
-  
+    "keywords": ["zoho", "crm", "laravel", "multi-account", "oauth2"],
+    "require-dev": {
+        "phpunit/phpunit": "^10.5",
+        "orchestra/testbench": "^8.18"
+    }
+}
