@@ -55,11 +55,7 @@ class OAuthCallbackController extends Controller
 
             File::delete($pendingFile); // nettoyage
 
-            return response()->json([
-                'success' => true,
-                'name' => $name,
-                'message' => "✅ CRM [$name] ajouté avec succès",
-            ]);
+            return response("✅ CRM [$name] ajouté avec succès !");
         } catch (\Throwable $e) {
             return response()->json([
                 'error' => true,
