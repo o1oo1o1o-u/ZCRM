@@ -90,19 +90,8 @@ class ZohoHttpClient
             }
 
             return $data;
-        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
             logger($e);
-            $body = method_exists($e, 'getResponse') && $e->getResponse()
-                ? (string) $e->getResponse()->getBody()
-                : '⚠️ Aucune réponse ou accès impossible à getResponse().';
-
-            logger()->error("❌ Erreur Zoho ($method $endpoint) :
-        Message : " . $e->getMessage() . "
-        Code : " . $e->getCode() . "
-        Classe : " . get_class($e) . "
-        Contenu : " . $body);
-
-            throw new ZCRMException("Erreur lors de la requête $method $endpoint : " . $e->getMessage(), $e->getCode(), $e);
         }
     }
 
