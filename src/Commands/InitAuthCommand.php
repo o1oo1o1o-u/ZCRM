@@ -17,12 +17,13 @@ class InitAuthCommand extends Command
     public function handle()
     {
         $clientId = $this->option('client_id');
-        $redirectUri = $this->option('redirect_uri');
+        $redirectUri = $this->option('redirect_uri')
+            ?? rtrim(config('app.url'), '/') . '/zcrm/callback';
         $scope = $this->option('scope') ?? 'ZohoCRM.modules.ALL';
         $region = $this->option('region') ?? 'eu';
 
-        if (!$clientId || !$redirectUri) {
-            $this->error('Vous devez fournir --client_id et --redirect_uri');
+        if (!$clientId) {
+            $this->error('Vous devez fournir --client_id ');
             return 1;
         }
 
