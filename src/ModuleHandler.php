@@ -146,15 +146,12 @@ class ModuleHandler
 
         $endpoint = "{$this->module}/{$recordId}/Attachments";
 
-        $response = $this->client->request('POST', $endpoint, [
-            'multipart' => [
-                [
-                    'name'     => 'file',
-                    'contents' => fopen($filePath, 'r'),
-                    'filename' => basename($filePath),
-                ],
+        $response = $this->client->postMultipart($endpoint, [
+            [
+                'name'     => 'file',
+                'contents' => fopen($filePath, 'r'),
+                'filename' => basename($filePath),
             ],
-            // on n’écrase pas les headers ici : getHeaders() sera appliqué par défaut
         ]);
 
         if (!isset($response['data'][0])) {

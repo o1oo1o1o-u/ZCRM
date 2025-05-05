@@ -132,4 +132,8 @@ class ZohoHttpClient
     {
         return $this->request('PUT', $endpoint, ['json' => $data]);
     }
+    public function postMultipart(string $endpoint, array $multipart): array
+    {
+        return $this->request('POST', $endpoint, ['multipart' => $multipart]);
+    }
 }
