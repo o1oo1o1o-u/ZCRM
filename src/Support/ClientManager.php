@@ -1,6 +1,6 @@
 <?php
 
-namespace ZCRM;
+namespace ZCRM\Support;
 
 use PDO;
 use Exception;
