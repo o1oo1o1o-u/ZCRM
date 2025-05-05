@@ -42,12 +42,14 @@ class OAuthCallbackController extends Controller
                 throw new ZCRMException('Pas de refresh_token reçu : ' . json_encode($data));
             }
 
-            // Enregistrer automatiquement
+            // Enregistrer automatiquement avec ton ClientManager SQLite
             $manager = new ClientManager();
-            $manager->add($name, [
+            $manager->addConnection([
+                'name' => $name,
                 'client_id' => $client_id,
                 'client_secret' => $client_secret,
                 'refresh_token' => $data['refresh_token'],
+                'api_domain' => "https://www.zohoapis.$region",
                 'region' => $region,
             ]);
 
