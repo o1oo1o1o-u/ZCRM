@@ -74,40 +74,40 @@ class ZohoHttpClient
         ];
     }
 
+    protected function request(string $method, string $endpoint, array $options = []): array
+    {
+        try {
+            $res = $this->http->request($method, $endpoint, array_merge([
+                'headers' => $this->getHeaders(),
+            ], $options));
+
+            $body = (string) $res->getBody();
+            $data = json_decode($body, true);
+
+            if (!is_array($data)) {
+                throw new ZCRMException("Réponse inattendue de Zoho ($method $endpoint):\n" . substr($body, 0, 1000));
+            }
+
+            return $data;
+        } catch (\Throwable $e) {
+            // Ajout d’un message explicite
+            throw new ZCRMException("Erreur lors de la requête $method $endpoint : " . $e->getMessage(), 0, $e);
+        }
+    }
+
+
     public function get(string $endpoint, array $query = []): array
     {
-        $res = $this->http->get($endpoint, [
-            'headers' => $this->getHeaders(),
-            'query' => $query,
-        ]);
-
-        $body = (string) $res->getBody();
-        $data = json_decode($body, true);
-
-        if (!is_array($data)) {
-            throw new ZCRMException("Réponse inattendue de Zoho (GET $endpoint): $body");
-        }
-
-        return $data;
+        return $this->request('GET', $endpoint, ['query' => $query]);
     }
 
     public function post(string $endpoint, array $data): array
     {
-        $res = $this->http->post($endpoint, [
-            'headers' => $this->getHeaders(),
-            'json' => $data,
-        ]);
-
-        return json_decode($res->getBody(), true);
+        return $this->request('POST', $endpoint, ['json' => $data]);
     }
 
     public function put(string $endpoint, array $data): array
     {
-        $res = $this->http->put($endpoint, [
-            'headers' => $this->getHeaders(),
-            'json' => $data,
-        ]);
-
-        return json_decode($res->getBody(), true);
+        return $this->request('PUT', $endpoint, ['json' => $data]);
     }
 }
