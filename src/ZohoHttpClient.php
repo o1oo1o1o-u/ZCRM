@@ -91,30 +91,43 @@ class ZohoHttpClient
     }
     protected function request(string $method, string $endpoint, array $options = []): array
     {
-        $res = $this->http->request($method, $endpoint, [
-            'headers' => $this->getHeaders(),
-            ...$options,
-        ]);
+        try {
+            $res = $this->http->request($method, $endpoint, [
+                'headers' => $this->getHeaders(),
+                ...$options,
+            ]);
 
-        $status = $res->getStatusCode();
-        $body = (string) $res->getBody();
+            $status = $res->getStatusCode();
+            $body = (string) $res->getBody();
 
-        // Log optionnel complet (si tu veux garder)
-        // logger()->debug('Réponse Zoho', extractGuzzleResponse($res));
+            if ($status === 204 || trim($body) === '') {
+                return [];
+            }
 
-        // Gérer les 204 ou contenu vide
-        if ($status === 204 || trim($body) === '') {
-            return []; // retourne un tableau vide au lieu de null
+            $json = json_decode($body, true);
+            if (json_last_error() !== JSON_ERROR_NONE || !is_array($json)) {
+                throw new ZCRMException("Réponse inattendue de Zoho ($method $endpoint): contenu non JSON.");
+            }
+
+            return $json;
+        } catch (\Throwable $e) {
+            // Détails Guzzle
+            $message = "Erreur HTTP ($method $endpoint): " . $e->getMessage();
+
+            if ($e instanceof \GuzzleHttp\Exception\RequestException && $e->hasResponse()) {
+                $res = $e->getResponse();
+                $code = $res->getStatusCode();
+                $body = (string) $res->getBody();
+
+                logger()->error("Zoho [$method $endpoint] - HTTP $code:\n" . $body);
+
+                $message .= "\nRéponse Zoho [$code]:\n" . $body;
+            }
+
+            throw new ZCRMException($message, $e->getCode(), $e);
         }
-
-        $json = json_decode($body, true);
-
-        if (json_last_error() !== JSON_ERROR_NONE || !is_array($json)) {
-            throw new ZCRMException("Réponse inattendue de Zoho ($method $endpoint): contenu non JSON ou vide.");
-        }
-
-        return $json;
     }
+
 
 
 
