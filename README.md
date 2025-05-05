@@ -10,17 +10,18 @@
 - [Fonctionnalités](#-fonctionnalités)
 - [Installation](#-installation)
 - [Prérequis](#-prérequis--créer-une-app-zoho)
-- [Ajouter une connexion CRM](#-ajouter-une-connexion-crm)
+- [Configuration](#-configuration)
 - [Utilisation](#-utilisation)
-  - [Récupérer des données](#récupérer-des-données)
-  - [Créer / mettre à jour / supprimer](#créer--mettre-à-jour--supprimer)
-  - [Pagination automatique](#récupérer-tous-les-enregistrements-pagination-automatique)
-  - [Upload de fichiers](#uploader-un-fichier)
-  - [Recherche avec critères](#-recherche-avec-critères)
-- [Commandes Artisan](#-artisan-commands-disponibles)
+  - [Sélection du CRM](#sélection-du-crm)
+  - [Récupération de données](#récupération-de-données)
+  - [Création, mise à jour et suppression](#création-mise-à-jour-et-suppression)
+  - [Pagination automatique](#pagination-automatique)
+  - [Upload de fichiers](#upload-de-fichiers)
+  - [Recherche avancée](#recherche-avancée)
+- [Commandes Artisan](#-commandes-artisan)
 - [Stockage des connexions](#-stockage-des-connexions)
 - [Gestion des erreurs](#-gestion-des-erreurs)
-- [Roadmap](#-à-venir)
+- [Roadmap](#-roadmap)
 - [Auteur](#-auteur)
 - [Licence](#-licence)
 
@@ -28,7 +29,7 @@
 
 - ✅ **Support multi-comptes Zoho CRM** (stockage local SQLite)
 - 🔐 **Gestion automatique des tokens OAuth2** (avec refresh)
-- 🔄 **API fluide** via façade : `ZCRM::use()->useModule()->getRecords()`
+- 🔄 **API fluide** via façade : `ZCRM::use('moncrm')->useModule('Leads')->getRecords()`
 - 📦 **Support des modules standard** (Leads, Contacts, Deals, etc.)
 - 📄 **Pagination automatique** avec `getAllRecords()`
 - 📎 **Upload de fichiers** avec `uploadFile()`
@@ -39,7 +40,7 @@
 
 ### 1. Ajouter le dépôt GitHub dans Composer
 
-Ajoute ce dépôt dans ton `composer.json` si ce n’est pas déjà fait :
+Ajoutez ce dépôt dans votre `composer.json` :
 
 ```json
 "repositories": [
@@ -50,18 +51,19 @@ Ajoute ce dépôt dans ton `composer.json` si ce n’est pas déjà fait :
 ]
 ```
 
-OU
+OU utilisez la commande :
 
 ```bash
 composer config repositories.zcrm vcs https://github.com/o1oo1o1o-u/ZCRM.git
 ```
 
+Puis installez le package :
+
 ```bash
 composer require devreux/zcrm-multi:^1.0
 ```
 
-
-### 2. Publier la config
+### 2. Publier la configuration
 
 ```bash
 php artisan vendor:publish --tag=config
@@ -69,78 +71,120 @@ php artisan vendor:publish --tag=config
 
 ## ⚙️ Prérequis : créer une app Zoho
 
-Tu dois enregistrer ton app Zoho pour récupérer les identifiants d'API.
+Vous devez enregistrer votre application Zoho pour récupérer les identifiants d'API.
 
 📖 [Documentation officielle](https://www.zoho.com/crm/developer/docs/api/register-client.html)
 
 ### Étapes :
-1. Va sur [Zoho API Console](https://api-console.zoho.com/)
-2. Crée une app (Server-based)
-3. Définis une URL de redirection (ex: http://localhost/callback)
-4. Note les `client_id`, `client_secret`
-5. Génére ton `refresh_token` via l'URL OAuth (voir doc)
+1. Connectez-vous sur [Zoho API Console](https://api-console.zoho.com/)
+2. Créez une application de type "Server-based"
+3. Définissez une URL de redirection (ex: http://localhost/zcrm/callback)
+4. Notez les `client_id` et `client_secret` fournis
+5. Configurez les scopes nécessaires (par défaut : `ZohoCRM.modules.ALL`)
 
-## ➕ Ajouter une connexion CRM
+## 🔧 Configuration
+
+Il existe deux méthodes pour configurer une connexion CRM :
+
+
+### Commande `zcrm:init-auth` (assistée)
+
+Cette méthode génère un lien d'autorisation et configure tout automatiquement :
 
 ```bash
-php artisan zcrm:add-crm \
+php artisan zcrm:init-auth \
   --name=moncrm \
   --client_id=1000.abcxyz \
   --client_secret=xxxxxxxx \
-  --refresh_token=1000.xxx.yyy.zzz \
   --region=eu
 ```
 
-> ⚠️ Si tu n'utilises pas `use('moncrm')`, le premier CRM enregistré est utilisé par défaut.
+La commande générera un lien à ouvrir dans votre navigateur pour autoriser l'application.
+
+> ⚠️ Si vous n'utilisez pas `use('moncrm')`, le premier CRM enregistré sera utilisé par défaut.
 
 ## ✅ Utilisation
 
-### Récupérer des données
+### Sélection du CRM
 
 ```php
 use ZCRM;
 
+// Utiliser un CRM spécifique
 $leads = ZCRM::use('moncrm')->useModule('Leads')->getRecords();
 
+// Utiliser le CRM par défaut (premier enregistré)
 $contact = ZCRM::useModule('Contacts')->getRecord('1234567890');
 ```
 
-### Créer / mettre à jour / supprimer
+### Récupération de données
 
 ```php
+// Récupérer tous les enregistrements d'un module (max 200 par défaut)
+$leads = ZCRM::useModule('Leads')->getRecords();
+
+// Récupérer un enregistrement spécifique par ID
+$contact = ZCRM::useModule('Contacts')->getRecord('1234567890');
+
+// Récupérer avec options supplémentaires
+$leads = ZCRM::useModule('Leads')->getRecords([
+    'fields' => 'First_Name,Last_Name,Email,Phone',
+    'sort_by' => 'Created_Time',
+    'sort_order' => 'desc',
+    'per_page' => 100
+]);
+```
+
+### Création, mise à jour et suppression
+
+```php
+// Créer un nouvel enregistrement
 $newLead = ZCRM::useModule('Leads')->createRecord([
     'First_Name' => 'Ju',
     'Last_Name' => 'Devreux',
     'Email' => 'ju@devreux.fr'
 ]);
 
+// Mettre à jour un enregistrement existant
 ZCRM::useModule('Deals')->updateRecord('987654321', [
-    'Stage' => 'Qualification'
+    'Stage' => 'Qualification',
+    'Amount' => 15000
 ]);
 
+// Supprimer un enregistrement
 ZCRM::useModule('Leads')->deleteRecord('1234567890');
 ```
 
-### Récupérer tous les enregistrements (pagination automatique)
+### Pagination automatique
 
 ```php
+// Récupérer TOUS les enregistrements (gestion auto des pages)
 $allDeals = ZCRM::useModule('Deals')->getAllRecords();
+
+// Avec options supplémentaires
+$clients = ZCRM::useModule('Contacts')->getAllRecords([
+    'fields' => 'First_Name,Last_Name,Email',
+    'sort_by' => 'Created_Time'
+]);
 ```
 
-### Uploader un fichier
+### Upload de fichiers
 
 ```php
-ZCRM::useModule('Leads')->uploadFile('12345', storage_path('devis.pdf'));
+// Uploader un fichier pour un enregistrement
+ZCRM::useModule('Leads')->uploadFile('12345', storage_path('app/devis.pdf'));
 ```
 
-## 🔍 Recherche avec critères
+### Recherche avancée
 
-En string brute :
+#### Méthode 1 : Avec une chaîne de critères
+
 ```php
-ZCRM::useModule('Leads')->findByCriteria('(City:equals:Paris)');
+$parisiens = ZCRM::useModule('Leads')->findByCriteria('(City:equals:Paris)');
 ```
 
-Avec le builder fluide :
+#### Méthode 2 : Avec le builder fluide
+
 ```php
 use ZCRM\Support\ZCRMSearchBuilder;
 
@@ -149,27 +193,36 @@ $criteria = ZCRMSearchBuilder::make()
     ->andWhere('City', 'equals', 'Lyon');
 
 $results = ZCRM::useModule('Contacts')->findByCriteria($criteria);
+
+// Conditions plus avancées
+$criteria = ZCRMSearchBuilder::make()
+    ->where('Last_Name', 'equals', 'Durand')
+    ->andWhere('Created_Time', 'between', '2023-01-01,2023-12-31')
+    ->orWhere('Email', 'contains', 'gmail.com');
+
+$results = ZCRM::useModule('Leads')->findByCriteria($criteria);
 ```
 
-## 🔧 Artisan commands disponibles
+## 🔧 Commandes Artisan
 
-| Commande | Description |
-|----------|-------------|
-| `zcrm:add-crm` | Ajouter une connexion CRM |
-| `zcrm:list-crm` | Lister toutes les connexions CRM enregistrées |
-| `zcrm:remove-crm {nom}` | Supprimer une connexion CRM |
+| Commande | Description | Paramètres |
+|----------|-------------|------------|
+| `zcrm:add-crm` | Ajouter une connexion CRM | `--name`, `--client_id`, `--client_secret`, `--refresh_token`, `--region` |
+| `zcrm:init-auth` | Initialiser OAuth en une étape | `--name`, `--client_id`, `--client_secret`, `--region`, [`--redirect_uri`], [`--scope`] |
+| `zcrm:list-crm` | Lister toutes les connexions CRM | - |
+| `zcrm:remove-crm` | Supprimer une connexion CRM | `{name}` |
 
 ## 📦 Stockage des connexions
 
 Les connexions sont stockées dans un fichier SQLite local :
 
-```bash
+```
 storage/app/zcrm/crm_connections.sqlite
 ```
 
 Champs enregistrés :
 - `name` (clé d'accès)
-- `client_id`, `client_secret`
+- `client_id`, `client_secret` 
 - `refresh_token`
 - `access_token`, `expires_at` (auto-géré)
 - `region`, `api_domain`
@@ -180,19 +233,20 @@ Toutes les erreurs lèvent une exception `ZCRM\Exceptions\ZCRMException`.
 
 ```php
 try {
-    $lead = ZCRM::useModule('Leads')->getRecord('invalid');
+    $lead = ZCRM::useModule('Leads')->getRecord('invalid_id');
 } catch (\ZCRM\Exceptions\ZCRMException $e) {
-    logger()->error($e->getMessage());
+    logger()->error('Erreur Zoho CRM: ' . $e->getMessage());
+    // Gérer l'erreur...
 }
 ```
 
-## 📚 À venir
+## 📚 Roadmap
 
-- Recherche par email ou téléphone
-- Modules personnalisés
-- Téléchargement de pièces jointes
-- Cache et log optionnels
-- Tests unitaires
+- [ ] Recherche par email ou téléphone
+- [ ] Support des modules personnalisés
+- [ ] Téléchargement de pièces jointes
+- [ ] Cache et log optionnels
+- [ ] Tests unitaires
 
 ## 👨‍💻 Auteur
 

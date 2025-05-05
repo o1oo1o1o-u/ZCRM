@@ -81,7 +81,7 @@ class ClientManager
             $stmt = $this->db->prepare("SELECT * FROM crm_connections WHERE name = :name LIMIT 1");
             $stmt->execute([':name' => $name]);
         } else {
-            $stmt = $this->db->query("SELECT * FROM crm_connections ORDER BY created_at ASC LIMIT 1");
+            $stmt = $this->db->query("SELECT * FROM crm_connections ORDER BY id ASC LIMIT 1");
         }
 
         $result = $stmt->fetch(PDO::FETCH_ASSOC);

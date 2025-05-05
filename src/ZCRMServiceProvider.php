@@ -3,11 +3,9 @@
 namespace ZCRM;
 
 use Illuminate\Support\ServiceProvider;
-use ZCRM\Commands\AddCrmCommand;
 use ZCRM\Commands\ListCrmCommand;
 use ZCRM\Commands\RemoveCrmCommand;
 use ZCRM\Commands\InitAuthCommand;
-use ZCRM\Commands\ExchangeCodeCommand;
 
 class ZCRMServiceProvider extends ServiceProvider
 {
@@ -24,11 +22,9 @@ class ZCRMServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->commands([
-                AddCrmCommand::class,
                 ListCrmCommand::class,
                 RemoveCrmCommand::class,
                 InitAuthCommand::class,
-                ExchangeCodeCommand::class,
             ]);
         }
 
