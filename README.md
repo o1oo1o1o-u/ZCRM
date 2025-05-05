@@ -101,7 +101,8 @@ php artisan zcrm:init-auth \
 
 La commande générera un lien à ouvrir dans votre navigateur pour autoriser l'application.
 
-> ⚠️ Si vous n'utilisez pas `use('moncrm')`, le premier CRM enregistré sera utilisé par défaut.
+> ⚠️ ZCRM garde en mémoire le dernier CRM utilisé via `use('...')`.
+> Si aucun n’est défini, le premier CRM enregistré sera utilisé par défaut.
 
 ## ✅ Utilisation
 
